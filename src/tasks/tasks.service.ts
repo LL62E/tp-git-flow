@@ -20,6 +20,23 @@ export class TasksService {
     });
   }
 
+  async getStats() {
+    const [total, done] = await Promise.all([
+      this.prisma.task.count(),
+      this.prisma.task.count({
+        where: {
+          done: true,
+        },
+      }),
+    ]);
+
+    return {
+      total,
+      done,
+      pending: total - done,
+    };
+  }
+
   async findOne(id: number): Promise<Task> {
     const task = await this.prisma.task.findUnique({ where: { id } });
     if (!task) {
